@@ -7,7 +7,17 @@ class MoviesController < ApplicationController
   end
 
   def index
-    @movies = Movie.order(params[:sort])
+    # initialize variables 
+    @all_ratings = Movie.all_ratings
+    @ratings_to_show = []
+    
+    if params[:ratings] # if box(es) selected
+      @ratings_list = params[:ratings].keys # all selected boxes
+      @ratings_to_show = @ratings_list # update checked boxes
+      @movies = Movie.with_ratings(@ratings_list)
+    else # sort by asc for title or /release_date
+      @movies = Movie.order(params[:sort])
+    end
   end
 
   def new
