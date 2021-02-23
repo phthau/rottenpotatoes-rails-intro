@@ -10,14 +10,15 @@ class MoviesController < ApplicationController
     # initialize variables 
     @all_ratings = Movie.all_ratings
     @ratings_to_show = []
-    
-    if params[:ratings] # if box(es) selected
-      @ratings_list = params[:ratings].keys # all selected boxes
-      @ratings_to_show = @ratings_list # update checked boxes
-      @movies = Movie.with_ratings(@ratings_list)
-    else # sort by asc for title or /release_date
-      @movies = Movie.order(params[:sort])
+    if params[:ratings]
+      @ratings_to_show = params[:ratings].keys
     end
+    @sort_order = "title"
+    if params[:sort]
+      @sort_order = params[:sort]
+    end 
+    @current_ratings = Hash[@ratings_to_show.map{ |k| [k] }] 
+    @movies = Movie.with_ratings(params)
   end
 
   def new

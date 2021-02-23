@@ -3,7 +3,11 @@ class Movie < ActiveRecord::Base
         ['G','PG','PG-13','R']
     end
     
-    def self.with_ratings(rating_list) 
-        where(:rating => rating_list)
+    def self.with_ratings(params) 
+        if params[:ratings]
+            where(:rating => params[:ratings].keys).order(params[:sort])
+        else 
+            order(params[:sort])
+        end
     end
 end
