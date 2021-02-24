@@ -12,9 +12,17 @@ class MoviesController < ApplicationController
     @ratings_to_show = []
     @sort_by = nil
     
+    # detect if it is the first time landing here 
+    # clear session if it is not returning from a 'show' view or filter/sort query
+    if not params[:returning] and not params[:commit] 
+      session.clear
+      session[:filter]= []
+      session[:sort] = nil
+    end 
+    
     if params[:commit] # if form is submitted
-      # assign empty array if no boxes are selected
-      session[:filter] = params[:ratings] ? params[:ratings].keys : [] 
+      # set to empty array if none is selected
+      session[:filter] = params[:ratings] ? params[:ratings].keys : []
     end
     @ratings_to_show = session[:filter]
     
