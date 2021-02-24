@@ -7,18 +7,25 @@ class MoviesController < ApplicationController
   end
 
   def index
-    # initialize variables 
+    # invitialize variables
     @all_ratings = Movie.all_ratings
     @ratings_to_show = []
-    if params[:ratings]
-      @ratings_to_show = params[:ratings].keys
+    @sort_by = nil
+    
+    if params[:commit] # if form is submitted
+      # assign empty array if no boxes are selected
+      session[:filter] = params[:ratings] ? params[:ratings].keys : [] 
     end
-    @sort_order = "title"
-    if params[:sort]
-      @sort_order = params[:sort]
-    end 
+    @ratings_to_show = session[:filter]
+    
+    # if sorting setting is not provided, default is nil
+    if params[:sort]  
+      session[:sort] = params[:sort] 
+    end
+    @sort_by = session[:sort]
+
     @current_ratings = Hash[@ratings_to_show.map{ |k| [k] }] 
-    @movies = Movie.with_ratings(params)
+    @movies = Movie.with_ratings(@ratings_to_show, @sort_by)
   end
 
   def new
