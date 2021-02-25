@@ -7,33 +7,29 @@ class MoviesController < ApplicationController
   end
 
   def index
-    # invitialize variables
+    # initialize variables
     @all_ratings = Movie.all_ratings
-    @ratings_to_show = []
-    @sort_by = nil
     
-    # detect if it is the first time landing here 
-    # clear session if it is not returning from a 'show' view or filter/sort query
-    if not params[:returning] and not params[:commit] 
+    # detect if it is the first time on home. if yes, clear session
+    if !params[:returning]
       session.clear
       session[:filter]= []
       session[:sort] = nil
     end 
     
+    # update session
     if params[:commit] # if form is submitted
       # set to empty array if none is selected
       session[:filter] = params[:ratings] ? params[:ratings].keys : []
     end
-    @ratings_to_show = session[:filter]
-    
-    # if sorting setting is not provided, default is nil
-    if params[:sort]  
+    if params[:sort] # if sorting setting is not provided, default is nil
       session[:sort] = params[:sort] 
     end
-    @sort_by = session[:sort]
+    
+    @ratings_to_show = session[:filter]
+    @sort = session[:sort]
 
-    @current_ratings = Hash[@ratings_to_show.map{ |k| [k] }] 
-    @movies = Movie.with_ratings(@ratings_to_show, @sort_by)
+    @movies = Movie.with_ratings(@ratings_to_show, @sort)
   end
 
   def new
@@ -61,7 +57,7 @@ class MoviesController < ApplicationController
     @movie = Movie.find(params[:id])
     @movie.destroy
     flash[:notice] = "Movie '#{@movie.title}' deleted."
-    redirect_to movies_path
+    redirect_to movies_path(:returning => true)
   end
 
   private
